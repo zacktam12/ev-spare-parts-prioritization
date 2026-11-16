@@ -1,0 +1,17 @@
+{
+  "name": "trh",
+  "version": "1.0.0",
+  "description": "Project trh",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zacktam12/trh.git"
+  },
+  "keywords": [],
+  "author": "zacktam12",
+  "license": "MIT"
+}
