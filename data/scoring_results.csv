@@ -1,0 +1,31 @@
+vehicle,part_category,demand_evidence,market_scarcity,vehicle_compatibility,sourcing_practicality,evidence_confidence,score_justification,priority_score,rank,score_Original,score_Scarcity-first,score_Equal weights,score_Evidence-focused
+BYD Seagull,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Yuan Up,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+Toyota bZ4X,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0

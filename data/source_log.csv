@@ -1,0 +1,8 @@
+source_id,source_name,url,source_type,collection_date,what_it_provides,reliability_note
+S001,Adey Market,https://adey-market.com/categories/cars?type=cars_electric,Marketplace,2026-11-17,EV marketplace listings for Ethiopian market,Listings are not confirmed sales or registrations
+S002,Gezat Electric,https://ev.gezat.et/,Distributor catalogue,2026-11-17,Vehicle model visibility in Ethiopian market,Confirm actual availability and trim level
+S003,Landin BYD Parts,https://www.landinparts.com/byd/,Parts supplier catalogue,2026-11-17,BYD spare parts and fitment evidence,Verify exact vehicle variant and OEM number
+S004,BYD Seagull Parts (CQSW),https://www.cqswautoparts.com/part-numbers-for-byd-seagull-spare-parts,Parts reference,2026-11-17,Seagull part numbers and categories,Verify against another source where possible
+S005,Toyota Parts Catalogue,https://www.toyota-spare-parts.com/toyota-cars/BZ4X,Parts catalogue,2026-11-17,bZ4X parts information and fitment,Confirm model year and fitment details
+S006,VW Parts Catalogue,https://exist.ae/catalog/cars/volkswagen/id-4,Parts catalogue,2026-11-17,ID.4 parts information (reference only),Confirm model year and fitment
+S007,NHTSA,https://www.nhtsa.gov/nhtsa-datasets-and-apis,Government dataset,2026-11-17,US vehicle complaints and recalls,US-market evidence only — not direct Ethiopian demand
