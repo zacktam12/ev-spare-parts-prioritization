@@ -1,31 +1,31 @@
 vehicle,part_category,demand_evidence,market_scarcity,vehicle_compatibility,sourcing_practicality,evidence_confidence,score_justification,priority_score,rank,score_Original,score_Scarcity-first,score_Equal weights,score_Evidence-focused
-BYD Seagull,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Seagull,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-BYD Yuan Up,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Brake pads,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Brake discs,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Cabin-air filter,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Wiper blades,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Headlight assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Tail-light assembly,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Side mirror,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Bumper,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Fender / body panel,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
-Toyota bZ4X,Shock absorber,0,0,0,0,0,,0.0,1,0.0,0.0,0.0,0.0
+BYD Seagull,Side mirror,5,4,5,5,5,Highest urban collision incidence in narrow Addis streets; Landin priced at $37-$60 (EQEA-8202100/EQEA-8202109); high local demand.,4.75,1,4.75,4.7,4.8,4.8
+Toyota bZ4X,Shock absorber,5,4,5,4,5,High suspension stress on Ethiopian roads combined with NHTSA recall 22V444 wheel hub/strut connection stress; Toyota OEM 48520-42290.,4.6,2,4.6,4.55,4.6,4.65
+BYD Yuan Up,Side mirror,5,5,4,4,4,High collision frequency in city traffic; motorized camera assembly priced at $81 USD.,4.55,3,4.55,4.55,4.4,4.45
+Toyota bZ4X,Brake pads,5,3,5,5,5,"NHTSA complaint 11524312 on brake shudder + heavy 2,000kg+ vehicle mass; Toyota OEM 04465-42250 priced at $78.50; global sourcing easy.",4.5,4,4.5,4.4,4.6,4.6
+BYD Yuan Up,Brake pads,5,4,4,5,4,"Strongest marketplace listing base (1,360+ listings); frequent wear item; priced at ~$25 USD; easy air freight.",4.45,5,4.45,4.4,4.4,4.4
+BYD Seagull,Brake pads,4,4,5,5,5,Regular friction wear in urban stop-and-go driving; Landin verified OEM EQEA-3501500CH/EQEA-3502140SS cross-matched with CQSW; priced affordably at $8.96 (64 RMB); light freight footprint.,4.45,5,4.45,4.45,4.6,4.55
+BYD Yuan Up,Cabin-air filter,5,4,4,5,4,Essential routine service part for massive Yuan Up fleet; low unit cost ($6.70) and zero local supply.,4.45,5,4.45,4.4,4.4,4.4
+BYD Seagull,Cabin-air filter,5,3,5,5,4,High periodic replacement demand due to Addis Ababa dust & unpaved roads; OEM 13149540-00 verified; very cheap ($4.90) and lightweight to import in bulk.,4.4,8,4.4,4.3,4.4,4.4
+BYD Seagull,Shock absorber,4,4,5,4,5,Rough road and pothole damage drives suspension wear; OEM EQEA-2905100A/2905200A priced at $19.32 (138 RMB).,4.3,9,4.3,4.3,4.4,4.4
+BYD Seagull,Headlight assembly,4,4,5,4,5,High collision vulnerability; Landin priced at $58.52 (418 RMB) with OEM EQEA-4121010B; high value repair part.,4.3,9,4.3,4.3,4.4,4.4
+Toyota bZ4X,Side mirror,4,4,5,4,5,Urban collision damage item; complex sensor-equipped mirror ($460 USD); verified Toyota OEM 87910-42E10.,4.3,9,4.3,4.3,4.4,4.4
+BYD Yuan Up,Headlight assembly,4,5,4,4,4,High value LED headlight unit ($203 USD); high repair shop demand following front collisions.,4.25,12,4.25,4.3,4.2,4.2
+Toyota bZ4X,Cabin-air filter,5,2,5,5,5,Routine maintenance; Toyota OEM 87139-58010 interchangeable across modern TNGA platforms; lower scarcity due to cross-compatibility.,4.25,12,4.25,4.1,4.4,4.4
+BYD Seagull,Bumper,4,4,5,3,5,"Front and rear covers (EQEA-2083111, EQEE-2803111) priced $12-$28 USD; bulk shipping volume makes sea container freight necessary.",4.15,14,4.15,4.15,4.2,4.25
+Toyota bZ4X,Bumper,4,4,5,3,5,High collision incidence for luxury EV SUV; Toyota OEM 52119-42C40 ($520 USD); high storage footprint.,4.15,14,4.15,4.15,4.2,4.25
+Toyota bZ4X,Headlight assembly,3,5,5,3,5,"High-end matrix LED ($1,180 USD); severe financial risk for new importer to stock in bulk; low velocity.",4.1,16,4.1,4.2,4.2,4.2
+Toyota bZ4X,Brake discs,4,3,5,4,5,Toyota OEM 43512-42150; heavy rotor wear under downhill braking with full battery; global availability solid.,4.05,17,4.05,4.0,4.2,4.2
+Toyota bZ4X,Tail-light assembly,3,4,5,4,5,Rear quarter assembly ($395 USD); rear impact repair; moderate velocity.,4.0,18,4.0,4.05,4.2,4.15
+BYD Seagull,Tail-light assembly,3,4,5,4,5,Rear collision damage item; 3 verified Landin listings (outer and center light bar EQEA-4107300) priced $27-$74 USD.,4.0,18,4.0,4.05,4.2,4.15
+BYD Seagull,Brake discs,3,4,5,4,5,Rotors wear slower due to regenerative braking; OEM EM2E-3501011/EM2E-3502111 confirmed; priced $13-$15 USD; heavier shipping weight reduces practicality relative to pads.,4.0,18,4.0,4.05,4.2,4.15
+BYD Yuan Up,Shock absorber,4,4,4,4,4,SUV suspension takes heavy pounding on unpaved roads; front strut priced at $47 USD.,4.0,18,4.0,4.0,4.0,4.0
+Toyota bZ4X,Wiper blades,4,2,5,5,5,"Standard seasonal wear item; universal Toyota wiper refills exist locally, reducing scarcity.",3.95,22,3.95,3.85,4.2,4.15
+BYD Yuan Up,Bumper,4,4,4,3,4,Front bumper shell ($86 USD); high demand from repair garages but large physical volume.,3.85,23,3.85,3.85,3.8,3.85
+Toyota bZ4X,Fender / body panel,3,4,5,3,5,Steel wing panel ($285 USD); replacement only in significant collision repairs; lower velocity.,3.85,23,3.85,3.9,4.0,4.0
+BYD Seagull,Fender / body panel,3,4,5,3,5,"16 verified Landin items covering doors, fenders, hood; lower turnover rate than consumable wear items; high volumetric shipping cost.",3.85,23,3.85,3.9,4.0,4.0
+BYD Yuan Up,Brake discs,3,4,4,4,4,Ventilated rotors for compact SUV curb weight; lower replacement frequency than pads.,3.7,26,3.7,3.75,3.8,3.75
+BYD Yuan Up,Tail-light assembly,3,4,4,4,4,Full LED rear light bar; urban collision vulnerability; moderate turnover.,3.7,26,3.7,3.75,3.8,3.75
+BYD Seagull,Wiper blades,4,2,4,5,4,"High seasonal replacement in Ethiopian rainy season (Kiremt); generic aftermarket wipers exist locally, lowering scarcity score.",3.65,28,3.65,3.55,3.8,3.75
+BYD Yuan Up,Wiper blades,4,2,4,5,4,"High seasonal replacement, but universal adapter blades provide local alternative.",3.65,28,3.65,3.55,3.8,3.75
+BYD Yuan Up,Fender / body panel,3,4,4,3,4,Front quarter panels; collision repair demand; lower inventory velocity.,3.55,30,3.55,3.6,3.6,3.6
