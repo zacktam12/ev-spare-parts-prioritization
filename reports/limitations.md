@@ -50,14 +50,14 @@ The following scoring inputs are analyst judgements. No local measurement, surve
 
 ---
 
-## 3. Market Scarcity Is Online Catalogue Scarcity
+## 3. Scarcity Measures Local Distributor Catalogue Gaps
 
-Scarcity (S) scores throughout this model measure **absence in publicly accessible online distributor and supplier catalogues** only. No physical inspection of:
+The Scarcity factor—specifically operationalized as **Local Distributor Catalogue Gap ($S$)**—measures the absence of a part from the investigated catalogues (Landin `S003` confirmed gaps; the Gezat `S002` review was conducted at catalogue/model level with **no per-part search recorded**), compared to overseas supplier availability (`S003` Landin, `S005` third-party catalogue). **Local per-part availability through Gezat is therefore unverified.** No physical inspection of:
 - Addis Ababa spare-parts wholesale market (e.g., Merkato automotive sector)
 - Toyota authorised dealer parts departments
 - BYD service centres or agents in Ethiopia
 
-was conducted. The actual brick-and-mortar availability may differ — higher or lower — than online catalogue scarcity implies.
+was conducted. The actual brick-and-mortar physical availability in Addis Ababa shops may differ—higher or lower—than online catalogue absence implies.
 
 ---
 
@@ -68,7 +68,7 @@ Adey Market listing counts (used for Demand scores) represent **active advertise
 - Sales volume data from any authorised distributor
 - Confirmed fleet sizes
 
-A vehicle model with 1,360+ Adey listings reflects strong secondary-market trading activity but does not directly measure how many vehicles of that model are currently on Ethiopian roads.
+The listing counts quoted in this project (Seagull 37, Yuan Up 36, bZ4X 28) come from the collected Adey dataset (`scrapper/outputs/adey_cleaned.csv`, 208 rows) and are treated as a **sample**, not a verified marketplace total. A vehicle model with a large number of Adey listings reflects strong secondary-market trading activity but does not directly measure how many vehicles of that model are currently on Ethiopian roads.
 
 ---
 
@@ -117,6 +117,13 @@ Factor scores are manually assigned analyst judgements. They are NOT algorithmic
 
 ---
 
-## 9. Single-Side Application Definition
+## 9. Primary Application Definition & Aggregation Rule
 
-Where a category has physically distinct LH/RH components (mirror assembly, headlight assembly, shock absorber strut), each rank position is defined as **one side-specific application**. The companion SKU (the other side) is listed beneath it in the findings table. An importer would typically stock both sides, but the ranking unit is one application to avoid inflating score counts by bundling two SKUs.
+Where a category has physically distinct LH/RH components (mirror assembly, headlight assembly, shock absorber strut) or multiple variant listings, the ranking and factor scoring are evaluated on **one primary representative application**:
+- **Side mirror**: Left exterior mirror assembly (`EQEA-8202100`) at 429 RMB (\$60.06 USD $\rightarrow$ $P=4$); companion RH mirror (`EQEA-8202109`) at 264 RMB (\$36.96 USD).
+- **Brake pads**: Front brake pad set (`EQEA-3501500CH`) at 64 RMB (\$8.96 USD $\rightarrow$ $P=5$); companion rear pad set at 64 RMB.
+- **Shock absorber**: Front shock absorber strut LH (`EQEA-2905100A`) at 138 RMB (\$19.32 USD $\rightarrow$ $P=5$); companion RH strut at 138 RMB.
+- **Bumper**: Front bumper cover upper fascia (`EQEA-2083111`) at 198 RMB (\$27.72 USD $\rightarrow$ $P=5$); coexisting lower grille is 88 RMB (\$12.32) and rear bumper is 198 RMB in OBS028.
+- **Headlight assembly**: Left headlight assembly (`EQEA-4121010B`) at 418 RMB (\$58.52 USD $\rightarrow$ $P=4$); companion RH headlight at 418 RMB.
+
+*Application Aggregation Rule for P*: Sourcing Practicality is evaluated against the verified catalogue price of the specific primary representative application explicitly cited. Coexisting secondary variants or unpriced entries within the same category are documented for transparency, but do not override the verified price of the primary application. An importer would typically stock companion SKUs (e.g., both LH and RH sides), but scoring is strictly anchored to the primary application to prevent artificial score distortion.
