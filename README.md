@@ -1,94 +1,187 @@
 # EV Spare-Parts Import Prioritization
 
-A data-driven recommendation system that identifies which EV replacement parts a new importer should prioritize for the Ethiopian market.
+A data-driven recommendation system that identifies which electric vehicle (EV) replacement parts a new automotive importer should prioritize for the Ethiopian market under constrained working capital and strict foreign exchange rationing.
 
 ## Business Context
 
-A client wants to import EV replacement parts into Ethiopia but cannot stock every part for every vehicle. This project turns incomplete public information into a defensible import recommendation by:
+Following Ethiopia's 2024 ban on internal combustion engine (ICE) passenger car imports, electric vehicles surged in Addis Ababa. However, the local spare-parts supply chain is severely bottlenecked. An importer cannot stock every component across every vehicle model.
 
-1. Selecting three EV models with strong Ethiopian marketplace presence
-2. Investigating 10 spare-part categories across those vehicles (30 combinations)
-3. Building a traceable dataset from public online evidence
-4. Scoring each vehicle-part combination using a weighted priority formula
-5. Recommending the five highest-priority parts to import first
+This project delivers an end-to-end, reproducible decision framework by:
+1. Selecting three representative EV models from live Ethiopian marketplace evidence
+2. Investigating 10 spare-part categories across those vehicles (a complete $3 \times 10 = 30$ combination matrix)
+3. Compiling an auditable evidence dataset of 59 empirical observations classified across 8 sources
+4. Cleaning and standardizing the dataset, preserving missing values and normalizing currencies to USD
+5. Evaluating all 30 combinations with an explainable, 5-factor weighted priority scoring model
+6. Verifying mathematical robustness across 4 contrasting weighting scenarios (**100.0% Top-5 Ranking Stability**)
+7. Recommending the top 5 prioritized part categories accompanied by concrete supplier-listed OE applications
+
+---
 
 ## Selected Vehicles
 
-| Vehicle | Justification |
-|---------|---------------|
-| BYD Seagull | Multiple listings on Adey Market; listed on Gezat Electric catalogue |
-| BYD Yuan Up | 1,360+ listings on Adey Market; listed on Gezat Electric catalogue |
-| Toyota bZ4X | Listed on both Adey Market and Gezat; Toyota brand recognition in Ethiopia |
+| Vehicle | Segment | Ethiopian Market Justification | Primary Evidence |
+|---------|---------|--------------------------------|------------------|
+| **BYD Seagull** | Subcompact Hatchback | Leading urban commuter; high traffic contact exposure; active commercial supplier catalogue. | 37 listings in this project's collected Adey sample (`S001`); 35 Landin catalogue listings (`S003`) — 23 priced, 12 price on request; compatibility supplier-claimed, stock not stated. |
+| **BYD Yuan Up** | Compact SUV / CUV | Dominant mass-market family crossover; crucial test case for supplier catalogue gap analysis. | 36 listings in this project's collected Adey sample (`S001`); confirmed catalogue gap on Landin (`S003`). |
+| **Toyota bZ4X** | Midsize Electric SUV | High brand equity in Ethiopia; established corporate and embassy fleet presence. | 28 listings in this project's collected Adey sample (`S001`); third-party parts catalogue (`S005`). |
 
-## Part Categories Investigated
+---
 
-Brake pads · Brake discs · Cabin-air filters · Wiper blades · Headlights · Tail lights · Side mirrors · Bumpers · Fenders/body panels · Shock absorbers
+## Part Categories Investigated (10 Categories)
+
+1. Brake pads
+2. Brake discs
+3. Cabin-air filter
+4. Wiper blades
+5. Headlight assembly
+6. Tail-light assembly
+7. Side mirror
+8. Bumper
+9. Fender / body panel
+10. Shock absorber
+
+*Total evaluated matrix: 3 vehicles × 10 categories = 30 combinations.*
+
+---
 
 ## Project Structure
 
 ```
 ev-spare-parts-prioritization/
 │
-├── README.md                           ← You are here
-├── requirements.txt                    ← Python dependencies
-├── REUSE.md                            ← Reference repository documentation
+├── README.md                           ← [You Are Here] Project overview & quickstart
+├── AGENT_HANDOFF.md                    ← Technical architecture & constraints for AI code agents
+├── requirements.txt                    ← Python virtual environment dependencies
+├── REUSE.md                            ← Reference repository attribution & audit
 │
 ├── data/
 │   ├── raw/
-│   │   └── raw_observations.csv        ← One row per source observation
+│   │   └── raw_observations.csv        ← 59 rows: unedited scraped & logged observations
 │   ├── cleaned/
-│   │   └── cleaned_observations.csv    ← Standardized, deduplicated data
-│   └── source_log.csv                  ← Every URL visited with dates
+│   │   └── cleaned_observations.csv    ← 59 rows, 23 columns: normalized currencies, clean taxonomy
+│   ├── source_log.csv                  ← Master registry of all 8 sources with URLs and dates
+│   └── scoring_results.csv             ← 30 rows: calculated factor scores, weights, sensitivity ranks
 │
-├── notebooks/
-│   ├── 01_vehicle_selection.ipynb       ← Vehicle selection with evidence
-│   ├── 02_data_collection.ipynb        ← Data gathering documentation
-│   ├── 03_data_cleaning.ipynb          ← Cleaning logic and transformations
-│   └── 04_analysis_and_scoring.ipynb   ← Scoring formula, sensitivity, top 5
+├── notebooks/                          ← 4 sequential, fully executed Jupyter Notebooks
+│   ├── 01_vehicle_selection.ipynb      ← Vehicle market analysis (5 candidates -> 3 selected)
+│   ├── 02_data_collection.ipynb        ← Evidence collection logging across 3x10 combinations
+│   ├── 03_data_cleaning.ipynb          ← Cleaning pipeline, currency normalization, missing flags
+│   └── 04_analysis_and_scoring.ipynb   ← Weighted scoring model, sensitivity matrix, visualizations
 │
-└── reports/
-    ├── findings.md                     ← Final recommendations summary
-    └── limitations.md                  ← Gaps, assumptions, missing data
+├── reports/
+│   ├── findings.md                     ← Final recommendations, OE application specs, and roadmap
+│   ├── limitations.md                  ← Documented data boundaries, catalogue gaps, and assumptions
+│   ├── comprehensive_project_report.md ← Master technical dossier for external audit
+│   ├── presentation.md                 ← 7-minute presentation script with speaker notes & defense Q&A
+│   ├── EV_Spare_Parts_Prioritization_Presentation.pptx ← 12-slide executive presentation
+│   └── figures/                        ← 300 DPI publication charts
+│       ├── scoring_matrix_heatmap.png  ← 30-combination prioritization heatmap
+│       ├── top10_priority_rankings.png ← Horizontal bar chart of Top 10 recommendations
+│       ├── sensitivity_comparison.png  ← Verification chart of 100% stability across 4 scenarios
+│       └── top5_radar_profiles.png     ← 5-axis factor radar charts for Top 5 recommendations
+│
+└── scrapper/                           ← Pipeline automation & export scripts
+    ├── generate_scores_defensible.py   ← Authoritative scoring and sensitivity analysis module
+    ├── export_figures.py               ← Visualizations exporter producing reports/figures/
+    └── generate_presentation.py        ← Presentation generator producing reports/*.pptx
 ```
 
-## Scoring Method
+---
 
-Each vehicle-part combination is scored using five weighted factors:
+## Scoring Method & Rubric
 
-| Factor | Weight | What It Measures |
-|--------|--------|------------------|
-| Demand evidence | 30% | Evidence that the part may be needed |
-| Market scarcity | 25% | Supply gap or limited availability |
-| Vehicle compatibility | 20% | Strength of verified fitment evidence |
-| Sourcing practicality | 15% | Ease of obtaining and importing the part |
-| Evidence confidence | 10% | Reliability and cross-checking of evidence |
+Each of the 30 vehicle-part combinations is scored using 5 weighted factors on a 1–5 scale:
 
-**Formula:**  
-`Priority Score = (0.30 × Demand) + (0.25 × Scarcity) + (0.20 × Compatibility) + (0.15 × Practicality) + (0.10 × Confidence)`
+$$\text{Priority Score} = 0.30 \times D + 0.25 \times S + 0.20 \times C + 0.15 \times P + 0.10 \times E$$
 
-Each factor is rated on a 1–5 scale. A sensitivity analysis tests whether changing the weights changes the ranking.
+| Factor | Weight | What It Measures | Justification for Weight |
+|--------|:------:|------------------|-------------------------|
+| **Demand Evidence Proxy ($D$)** | **30%** | Observed vehicle marketplace presence on Adey Market (`S001`) + component functional wear classification (friction wear vs collision contact vs structural). | Highest weight because an importer's greatest risk is stocking parts with low market turnover. *(Indicative assessment proxy; no workshop replacement rate measured. NHTSA records decoupled).* |
+| **Local Distributor Catalogue Gap ($S$)** | **25%** | Degree to which a part is absent from the investigated catalogues (Landin `S003` confirmed gaps; Gezat `S002` reviewed at catalogue/model level only), compared to overseas supplier availability (`S003`/`S005`). | Supply gaps in investigated catalogues indicate commercial stocking necessity. *(Measures investigated online catalogue gaps only; the Gezat `S002` review recorded no per-part search, so local per-part availability is UNVERIFIED. Does not establish physical unavailability in Addis Ababa shops).* |
+| **Vehicle Compatibility ($C$)** | **20%** | Verification level of supplier-listed OE reference in named catalogues. | Wrong-fit part shipments cause costly cross-border returns and dead inventory. Verified OE references mitigate fitment risk. |
+| **Catalogue Sourcing Practicality ($P$)** | **15%** | Catalogue listing status and unit catalogue price brackets in verified catalogues applied to the primary representative application evaluated. | Evaluates whether a part can be procured with transparent catalogue pricing (listing presence ≠ physical stock). Unverified trade quotations receive P=1 because sourcing feasibility cannot be confirmed without a verified supplier catalogue listing. |
+| **Evidence Confidence ($E$)** | **10%** | Degree of cross-validation across independent sources (`S001`–`S008`). | Acts as a data-quality trust multiplier, validating the reliability of underlying catalogue sources. |
 
-## How to Run
+*Application Aggregation Rule for $P$*: Category-level scoring evaluates the specific primary application explicitly cited in recommendations. Coexisting secondary variants or unpriced entries within the same category are documented for transparency, but do not override the verified price of the primary application.
 
-1. Clone this repository
-2. Create a virtual environment and install dependencies:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\Activate.ps1        # Windows PowerShell
-   pip install -r requirements.txt
-   ```
-3. Open the notebooks in order (01 → 02 → 03 → 04) in VS Code or Jupyter
+---
 
-## Data Sources
+## Data Sources (Complete 8-Source Registry)
 
-All sources are logged in [`data/source_log.csv`](data/source_log.csv) with URLs and collection dates.
+All 59 observations originate from 8 documented sources logged in [`data/source_log.csv`](data/source_log.csv):
 
-Key sources:
-- [Adey Market EV listings](https://adey-market.com/categories/cars?type=cars_electric)
-- [Gezat Electric catalogue](https://ev.gezat.et/)
-- [Landin BYD Parts](https://www.landinparts.com/byd/)
-- [NHTSA datasets](https://www.nhtsa.gov/nhtsa-datasets-and-apis)
+| Source ID | Source Name | Role in Project | Evidence Type / Output |
+|:---------:|-------------|-----------------|------------------------|
+| **`S001`** | **Adey Market** (`adey-market.com`) | Local vehicle marketplace volume | Vehicle market prices (1.9M–4.2M ETB) and sampled listing counts from this project's collected Adey dataset (Seagull 37, Yuan Up 36, bZ4X 28). |
+| **`S002`** | **Gezat Electric** (`ev.gezat.et`) | Investigated local EV distributor | Warranty terms and a catalogue/model-level review only — no per-part search recorded, so local per-part availability is UNVERIFIED (S-factor limitation). |
+| **`S003`** | **Landin BYD Parts** (`landinparts.com/byd/`) | Overseas supplier catalogue | 35 verified Seagull listings with prices and OE numbers; 8 documented catalogue gaps (filter, wiper, Yuan Up). |
+| **`S004`** | **CQSW Auto Parts** (`cqsw.com`) | Secondary benchmark catalogue | Corroborating benchmark used to cross-reference BYD part numbers; not a direct observation row. |
+| **`S005`** | **toyota-spare-parts.com** | Third-party parts catalogue | 10 Toyota bZ4X chassis/powertrain part listings and prices. *(Third-party aggregator, NOT official Toyota EPC).* |
+| **`S006`** | **NHTSA Datasets** (`nhtsa.gov`) | Safety & defect context | 2 safety context records (Recall 22V444 hub bolts; brake shudder). Used strictly as platform engineering context. |
+| **`S007`** | **AutoZone Catalogue** (`autozone.com`) | Aftermarket retail benchmark | Aftermarket benchmark for universal consumable dimensions (filters, wipers); not a direct observation row. |
+| **`S008`** | **Export Directory Quotations** | Unverified trade quotations | 4 trade quotations for Yuan Up with unverified trade codes. Scored conservatively ($P=1, E=1$). |
+
+---
+
+## Top 5 Final Recommendations
+
+The scoring model evaluates 30 vehicle-model + part-category combinations. The top 5 recommendations represent prioritized categories accompanied by concrete supplier-listed OE applications:
+
+| Rank | Vehicle Model | Part Category & Defined Application | Priority Score | Catalogue Price | Supplier-Listed OE Reference | Primary Sourcing Reference |
+|:----:|---------------|-------------------------------------|:--------------:|:---------------:|------------------------------|----------------------------|
+| **#1** | **BYD Seagull** | **Side mirror**<br>*(LH mirror; companion RH)* | **4.60** | 429 RMB ($60.06 USD)<br>*(RH: 264 RMB / $36.96)* | `EQEA-8202100` (LH)<br>`EQEA-8202109` (RH) | Landin Parts (`S003`) catalogue listing (stock not stated) |
+| **#2** | **BYD Seagull** | **Brake pads**<br>*(Front pad set; companion Rear)* | **4.45** | 64 RMB ($8.96 USD)<br>*(Rear: 64 RMB / $8.96)* | `EQEA-3501500CH` (Front)<br>`EQEA-3502140SS` (Rear) | Landin Parts (`S003`) / CQSW benchmark |
+| **#3** | **BYD Seagull** | **Shock absorber**<br>*(Front strut LH; companion RH)* | **4.45** | 138 RMB ($19.32 USD)<br>*(RH: 138 RMB / $19.32)* | `EQEA-2905100A` (LH)<br>`EQEA-2905200A` (RH) | Landin Parts (`S003`) suspension catalogue |
+| **#4** | **BYD Seagull** | **Bumper**<br>*(Front bumper cover upper fascia)* | **4.45** | 198 RMB ($27.72 USD) | `EQEA-2083111`<br>*(OE flagged for supplier confirmation — see limitations)* | Landin Parts (`S003`) body catalogue |
+| **#5** | **BYD Seagull** | **Headlight assembly**<br>*(LH headlight; companion RH)* | **4.30** | 418 RMB ($58.52 USD)<br>*(RH: 418 RMB / $58.52)* | `EQEA-4121010B` (LH)<br>`EQEA-4121020B` (RH) | Landin Parts (`S003`) lighting catalogue |
+
+*Sensitivity Analysis Finding: The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios. The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand.*
+
+---
+
+## Execution Guide
+
+### 1. Environment Setup
+```powershell
+# Create and activate virtual environment
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Install project dependencies
+pip install -r requirements.txt
+```
+
+### 2. End-to-End Pipeline Execution
+```powershell
+# 1. Execute scoring engine and output data/scoring_results.csv
+python scrapper/generate_scores_defensible.py
+
+# 2. Export high-resolution publication charts to reports/figures/
+python scrapper/export_figures.py
+
+# 3. Generate editable 12-slide PowerPoint presentation with speaker notes
+python scrapper/generate_presentation.py
+
+# 4. Execute all Jupyter Notebooks end-to-end
+python -m jupyter nbconvert --to notebook --execute --inplace notebooks/01_vehicle_selection.ipynb
+python -m jupyter nbconvert --to notebook --execute --inplace notebooks/02_data_collection.ipynb
+python -m jupyter nbconvert --to notebook --execute --inplace notebooks/03_data_cleaning.ipynb
+python -m jupyter nbconvert --to notebook --execute --inplace notebooks/04_analysis_and_scoring.ipynb
+```
+
+---
+
+## Deliverables Summary
+
+- **Master Technical Report**: [`reports/comprehensive_project_report.md`](reports/comprehensive_project_report.md)
+- **Detailed Findings & Procurement Roadmap**: [`reports/findings.md`](reports/findings.md)
+- **Documented Limitations & Assumptions**: [`reports/limitations.md`](reports/limitations.md)
+- **7-Minute Presentation Script & Defense Q&A**: [`reports/presentation.md`](reports/presentation.md)
+- **PowerPoint Presentation Deck**: [`reports/EV_Spare_Parts_Prioritization_Presentation.pptx`](reports/EV_Spare_Parts_Prioritization_Presentation.pptx)
+- **AI Agent Technical Handoff**: [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md)
+
+---
 
 ## License
 
-MIT
+MIT License. Grounded strictly in public automotive evidence.
