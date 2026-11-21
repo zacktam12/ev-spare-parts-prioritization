@@ -15,8 +15,19 @@ CREATE TABLE IF NOT EXISTS sources (
                           ('marketplace', 'distributor_catalogue', 'supplier_catalogue', 'trade_directory', 'regulator', 'benchmark')),
     market_scope        TEXT NOT NULL CHECK (market_scope IN ('Ethiopia', 'Regional', 'Global', 'China', 'US')),
     collection_date     DATE NOT NULL,
-    notes               TEXT
+    notes               TEXT,
+    reliability_tier    TEXT NOT NULL CHECK (reliability_tier IN ('A', 'B', 'C')),
+    url_verified        BOOLEAN NOT NULL CHECK (url_verified IN (0, 1, 'True', 'False'))
 );
+
+-- Tier legend (enforced above by CHECK, defined in docs/data_dictionary.md):
+--   'A' = authoritative (regulator dataset, named supplier catalogue carrying OEM
+--         part numbers with an explicit fitment statement, or an established parts
+--         reference benchmark);
+--   'B' = commercial third-party (marketplace, aggregator, distributor catalogue);
+--   'C' = unverified (unnamed trade directory).
+-- url_verified is FALSE for any source whose URL was not recorded at collection
+-- (currently S008 only); tier 'A'/'B' sources must carry a verified URL.
 
 -- 2. Vehicle Candidate Registry
 CREATE TABLE IF NOT EXISTS vehicle_models (

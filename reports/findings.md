@@ -120,3 +120,30 @@ The priority ranking was evaluated under four contrasting business perspectives 
 
 ### Stability Finding:
 The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios. The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand. Seagull side mirror scores range from 4.55 to 4.65 across scenarios, and brake pads, shock absorbers, and bumpers remain tightly clustered at 4.45 to 4.60.
+
+### Monte-Carlo Robustness (scenario-independent):
+The 4-scenario table only permutes weight vectors chosen by the analyst, so a stronger test was added: `run_monte_carlo()` draws 2,000 weight vectors uniformly from the 5-factor simplex (Dirichlet, `seed=42`) and records each combination's **Top-5 inclusion probability** (`data/sensitivity_monte_carlo.csv`, `reports/figures/monte_carlo_stability.png`).
+
+| Combination | Baseline Rank | Top-5 Inclusion Probability | Verdict |
+| :--- | :---: | :---: | :--- |
+| Seagull — Shock absorber | 3 | 99.1% | Robust |
+| Seagull — Bumper | 4 | 99.1% | Robust |
+| Seagull — Brake pads | 2 | 98.7% | Robust |
+| Seagull — Side mirror | 1 | 95.4% | Robust |
+| Seagull — Brake discs | 6 | 48.2% | Contested |
+| Seagull — Headlight assembly | 5 | 45.5% | Contested |
+
+**Reading:** the top **four** recommendations are robust to any reasonable re-weighting; the **5th slot is genuinely contested** between Headlight assembly and Brake discs. This is a more honest and defensible stability statement than the 4-scenario "100%" alone, and it is why the two rank-5 candidates are treated as an interchangeable pair rather than a fixed choice.
+
+### One-Way Factor Dropout (evidence-strength stress test):
+The Scarcity factor (`S`, weight 25%) rests partly on the Gezat (`S002`) distributor review, which was conducted at **catalogue/model level only** — no per-part search was recorded. To show the recommendation does not depend on that unverified input, `run_factor_dropout()` drops each factor to zero weight in turn, renormalises the remaining weights, and re-ranks (`data/sensitivity_factor_dropout.csv`).
+
+| Factor Removed | Top-5 Overlap with Baseline | Stability |
+| :--- | :---: | :---: |
+| Demand evidence (`D`) | 4 / 5 | 80% |
+| **Market scarcity (`S`)** | **5 / 5** | **100%** |
+| Vehicle compatibility (`C`) | 5 / 5 | 100% |
+| Sourcing practicality (`P`) | 5 / 5 | 100% |
+| Evidence confidence (`E`) | 5 / 5 | 100% |
+
+**Reading:** **removing `S` entirely leaves the Top-5 unchanged**, so the prioritisation is not an artefact of the unverified distributor review. Only Demand is load-bearing (removing it swaps the 5th slot); no other single factor moves the set at all.

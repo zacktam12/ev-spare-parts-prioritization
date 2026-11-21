@@ -132,3 +132,74 @@ def test_sensitivity_table_has_five_ranks(scoring_module):
     sens_df, _ = scoring_module.run_sensitivity_analysis(df)
     assert sens_df.shape == (5, 4)
     assert list(sens_df.index) == [f"Rank {i}" for i in range(1, 6)]
+
+
+# ---------------------------------------------------------------------------
+# Monte-Carlo robustness (Dirichlet weight draws)
+# ---------------------------------------------------------------------------
+def test_monte_carlo_returns_all_thirty_combinations(scoring_module):
+    mc, _ = scoring_module.run_monte_carlo()
+    assert len(mc) == 30
+    assert mc["p_top5"].between(0.0, 1.0).all()
+    # Every draw elects exactly MC_TOP_N winners, so inclusion probabilities sum to N.
+    assert abs(mc["p_top5"].sum() - scoring_module.MC_TOP_N) < 1e-9
+
+
+def test_monte_carlo_is_deterministic_for_a_fixed_seed(scoring_module):
+    first, _ = scoring_module.run_monte_carlo()
+    second, _ = scoring_module.run_monte_carlo()
+    pd.testing.assert_frame_equal(first, second)
+
+
+def test_monte_carlo_top_four_recommendations_are_robust(scoring_module):
+    """Robustness finding: the top 4 hold; only the 5th slot is contested."""
+    mc, _ = scoring_module.run_monte_carlo()
+    baseline = mc[mc["rank"] <= scoring_module.MC_TOP_N]
+    assert (baseline["p_top5"] >= 0.80).sum() == 4
+
+
+def test_monte_carlo_summary_reports_contested_fifth_slot(scoring_module):
+    _, summary = scoring_module.run_monte_carlo()
+    assert summary["n_sim"] == scoring_module.N_MONTE_CARLO
+    assert summary["seed"] == scoring_module.MC_SEED
+    assert summary["baseline_top5_all_robust"] is False
+    assert 0.40 <= summary["baseline_top5_min_p"] <= 0.50
+    assert summary["n_combinations_ever_top5"] >= scoring_module.MC_TOP_N
+
+
+# ---------------------------------------------------------------------------
+# One-way factor-dropout robustness (addresses the unverified Scarcity input)
+# ---------------------------------------------------------------------------
+def test_factor_dropout_tests_every_factor(scoring_module):
+    dropout_df, _ = scoring_module.run_factor_dropout()
+    assert list(dropout_df.index) == scoring_module.FACTOR_COLUMNS
+    assert len(dropout_df) == len(scoring_module.FACTOR_COLUMNS)
+
+
+def test_factor_dropout_is_deterministic(scoring_module):
+    first, _ = scoring_module.run_factor_dropout()
+    second, _ = scoring_module.run_factor_dropout()
+    pd.testing.assert_frame_equal(first, second)
+
+
+def test_removing_scarcity_preserves_the_top_five(scoring_module):
+    """The recommendation must not hinge on the unverified Gezat S002 review."""
+    dropout_df, summary = scoring_module.run_factor_dropout()
+    assert int(dropout_df.loc["market_scarcity", "overlap"]) == scoring_module.MC_TOP_N
+    assert summary["scarcity_dropout_overlap"] == scoring_module.MC_TOP_N
+
+
+def test_factor_dropout_only_demand_is_load_bearing(scoring_module):
+    """Dropping any single factor keeps at least 4 of 5; only Demand moves the set."""
+    dropout_df, summary = scoring_module.run_factor_dropout()
+    assert summary["min_overlap"] == scoring_module.MC_TOP_N - 1
+    below_full = dropout_df[dropout_df["overlap"] < scoring_module.MC_TOP_N]
+    assert list(below_full.index) == ["demand_evidence"]
+
+
+def test_committed_factor_dropout_csv_matches_engine_output(scoring_module, factor_dropout_csv):
+    fresh, _ = scoring_module.run_factor_dropout()
+    assert list(factor_dropout_csv.index) == list(fresh.index)
+    assert (factor_dropout_csv["overlap"] == fresh["overlap"]).all()
+    assert np.allclose(
+        factor_dropout_csv["stability_pct"], fresh["stability_pct"], atol=1e-9)

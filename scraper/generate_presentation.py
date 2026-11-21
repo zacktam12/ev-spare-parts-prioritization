@@ -502,7 +502,7 @@ s8.notes_slide.notes_text_frame.text = (
 # ==============================================================================
 s9 = prs.slides.add_slide(blank_layout)
 set_slide_background(s9, LIGHT_BG)
-add_header(s9, "Sensitivity Analysis: Stability Across 4 Tested Scenarios")
+add_header(s9, "Robustness: 4 Scenarios · 2,000-Draw Monte-Carlo · Factor Dropout")
 
 if os.path.exists('reports/figures/sensitivity_comparison.png'):
     s9.shapes.add_picture('reports/figures/sensitivity_comparison.png', Inches(0.8), Inches(1.6), width=Inches(7.2))
@@ -520,13 +520,15 @@ p.font.color.rgb = NAVY
 sc_notes = [
     ("4 Contrasting Scenarios Tested: ", "Baseline, Scarcity-First (30% S), Equal-Weights (20% each), and Evidence-Focused (20% E)."),
     ("100.0% Set Overlap: ", "The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios (|Top5_base ∩ Top5_sc| / 5 = 1.0)."),
+    ("Monte-Carlo Check (2,000 draws): ", "Drawing weights uniformly from the 5-factor simplex, the top 4 combinations are robust (≥95% Top-5 inclusion); the 5th slot is contested (Headlight 45.5% vs Brake discs 48.2%)."),
+    ("Factor Dropout (Gezat/S check): ", "Removing the unverified 25%-weight Scarcity factor entirely leaves the Top-5 unchanged (5/5), so the ranking does not hinge on the Gezat S002 review."),
     ("Score Ranges: ", "Seagull mirror ranges from 4.55 to 4.65 across scenarios; brake pads, shock absorbers, and bumpers range from 4.45 to 4.60."),
-    ("Defensible Interpretation: ", "The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand.")
+    ("Defensible Interpretation: ", "Stability holds under all three tests, but the 5th pick is an evidence-tied pair, not a fixed choice — no universal robustness or proven market demand is claimed.")
 ]
 
 for title, desc in sc_notes:
     bp = tf9.add_paragraph()
-    bp.space_before = Pt(10)
+    bp.space_before = Pt(8)
     r1 = bp.add_run()
     r1.text = "• " + title
     r1.font.bold = True
@@ -539,8 +541,12 @@ for title, desc in sc_notes:
 
 s9.notes_slide.notes_text_frame.text = (
     "Our sensitivity analysis verifies 100.0% set stability across four competing scenarios in notebook 04. "
-    "The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios. "
-    "The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand."
+    "We then stress-tested it two further ways. A 2,000-draw Monte-Carlo over the weight simplex shows the top four combinations are "
+    "robust (≥95% inclusion) and only the fifth slot is contested between Headlight assembly and Brake discs. "
+    "Finally, a one-way factor dropout removes each factor in turn: dropping the Scarcity factor entirely — the one resting on the "
+    "unverified Gezat S002 review — leaves the Top-5 unchanged, so the ranking does not depend on that weak input. "
+    "So the ranking is stable under all three tests, but we present the fifth pick as an interchangeable evidence-tied pair "
+    "rather than a fixed choice — no universal robustness or proven market demand is claimed."
 )
 
 # ==============================================================================
@@ -681,7 +687,9 @@ qas = [
     ("Q: Why did Toyota bZ4X shock absorber drop to Rank 8?",
      "A: Because toyota-spare-parts.com is a third-party aggregator catalogue, not official Toyota EPC. Labeling it honestly lowered Compatibility from 5 to 4 and Confidence from 5 to 3, yielding an honest score of 3.90."),
     ("Q: How sensitive is the ranking to your weight selections?",
-     "A: The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios. The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand.")
+     "A: Three tests. (1) The same five combinations stay in the top five across four tested scenarios. (2) A 2,000-draw Monte-Carlo over the weight simplex confirms the top four are robust (≥95% Top-5 inclusion), with only the 5th slot contested (Headlight 45.5% vs Brake discs 48.2%). (3) A one-way factor dropout shows removing any single factor keeps at least 4/5. Stability holds, but no universal robustness or proven market demand is claimed."),
+    ("Q: Your Scarcity (S) factor has the second-highest weight but rests on an unverified Gezat review. Isn't that a weak point?",
+     "A: It is the acknowledged weak input, and we tested exactly that. The Gezat S002 review was catalogue/model-level only with no per-part search, so local per-part availability is unverified. The factor-dropout test removes S entirely: the Top-5 is unchanged (5/5), so the prioritisation does not hinge on it. Removing any other single factor also keeps at least 4/5 — only Demand is load-bearing.")
 ]
 
 for q, a in qas:

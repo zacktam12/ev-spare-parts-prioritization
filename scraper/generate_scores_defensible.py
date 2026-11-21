@@ -88,6 +88,16 @@ WEIGHTS = {
     'Evidence-focused': {'demand_evidence': 0.25, 'market_scarcity': 0.20, 'vehicle_compatibility': 0.20, 'sourcing_practicality': 0.15, 'evidence_confidence': 0.20},
 }
 
+# Factor order used by the Monte-Carlo engine (must match db/schema.sql column order).
+FACTOR_COLUMNS = [
+    'demand_evidence', 'market_scarcity', 'vehicle_compatibility',
+    'sourcing_practicality', 'evidence_confidence',
+]
+
+N_MONTE_CARLO = 2000
+MC_SEED = 42
+MC_TOP_N = 5
+
 
 def get_scoring_data():
     return [
@@ -662,6 +672,104 @@ def run_sensitivity_analysis(df=None):
     return sens_df, stability_summary
 
 
+def run_monte_carlo(df=None, n_sim=N_MONTE_CARLO, alpha=1.0, seed=MC_SEED, top_n=MC_TOP_N):
+    """
+    Monte-Carlo robustness test over Dirichlet weight draws.
+
+    The four-scenario table in `run_sensitivity_analysis` only tests hand-picked
+    weight vectors, so "100% stable" is partly a statement about the analyst's choice
+    of scenarios. This test removes that dependence: it draws `n_sim` weight vectors
+    uniformly from the 5-factor simplex (Dirichlet(alpha)) and records how often each
+    combination lands in the Top-N. The resulting inclusion probability `p_top5` is the
+    defensible stability statement.
+
+    Deterministic: identical (seed, n_sim, alpha) always reproduce the same output.
+
+    Returns (mc_df, summary_dict).
+    """
+    if df is None or 'priority_score' not in df.columns:
+        df = calculate_scores(df)
+
+    rng = np.random.default_rng(seed)
+    factor_matrix = df[FACTOR_COLUMNS].to_numpy(dtype=float)
+    weights = rng.dirichlet(np.full(len(FACTOR_COLUMNS), float(alpha)), size=n_sim)
+
+    simulated = weights @ factor_matrix.T              # (n_sim, 30) weighted scores
+    winners = np.argsort(-simulated, axis=1)[:, :top_n]
+    counts = np.bincount(winners.ravel(), minlength=len(df))
+
+    mc = df[['vehicle', 'part_category', 'rank', 'priority_score']].copy()
+    mc['p_top5'] = counts / float(n_sim)
+    mc['stability'] = np.where(
+        mc['p_top5'] >= 0.80, 'robust',
+        np.where(mc['p_top5'] > 0.0, 'sensitive', 'excluded'))
+    mc = mc.sort_values(['p_top5', 'rank'], ascending=[False, True]).reset_index(drop=True)
+
+    baseline_top5 = mc[mc['rank'] <= top_n]
+    summary = {
+        'n_sim': int(n_sim),
+        'alpha': float(alpha),
+        'seed': int(seed),
+        'baseline_top5_min_p': float(baseline_top5['p_top5'].min()),
+        'baseline_top5_all_robust': bool((baseline_top5['p_top5'] >= 0.80).all()),
+        'n_combinations_ever_top5': int((mc['p_top5'] > 0).sum()),
+    }
+    return mc, summary
+
+
+def run_factor_dropout(df=None, top_n=MC_TOP_N):
+    """
+    One-way robustness test: drop each factor to zero weight, renormalise the
+    remaining weights, and check whether the baseline Top-N survives.
+
+    This directly addresses the reviewer concern that the 25%-weighted Scarcity
+    factor (S) rests partly on an UNVERIFIED distributor-channel review — the Gezat
+    S002 review was conducted at catalogue/model level only, with no per-part search
+    recorded. If the Top-N is unchanged when S is removed entirely, the
+    recommendation does not hinge on that unverified input.
+
+    Deterministic (no random draws).
+
+    Returns (dropout_df, summary_dict).
+    """
+    if df is None or 'priority_score' not in df.columns:
+        df = calculate_scores(df)
+
+    base = WEIGHTS['Original']
+    baseline_top5 = set(
+        (df[df['rank'] <= top_n]['vehicle'] + ' — ' +
+         df[df['rank'] <= top_n]['part_category']).tolist()
+    )
+
+    rows = []
+    for dropped in FACTOR_COLUMNS:
+        remaining = {k: v for k, v in base.items() if k != dropped}
+        total = sum(remaining.values())
+        temp = df.copy()
+        temp['drop_score'] = sum((w / total) * temp[k] for k, w in remaining.items())
+        top5 = (
+            temp.sort_values(['drop_score', 'demand_evidence'], ascending=[False, False])
+                .head(top_n)
+                .apply(lambda r: f"{r['vehicle']} — {r['part_category']}", axis=1)
+                .tolist()
+        )
+        overlap = len(baseline_top5.intersection(top5))
+        rows.append({
+            'dropped_factor': dropped,
+            'top5': ' | '.join(top5),
+            'overlap': overlap,
+            'stability_pct': (overlap / float(top_n)) * 100.0,
+        })
+
+    dropout_df = pd.DataFrame(rows).set_index('dropped_factor')
+    summary = {
+        'top_n': int(top_n),
+        'min_overlap': int(dropout_df['overlap'].min()),
+        'scarcity_dropout_overlap': int(dropout_df.loc['market_scarcity', 'overlap']),
+    }
+    return dropout_df, summary
+
+
 if __name__ == "__main__":
     df = calculate_scores()
     df.to_csv('data/scoring_results.csv', index=False)
@@ -675,3 +783,25 @@ if __name__ == "__main__":
     print("\n=== STABILITY SUMMARY ===")
     for sc, info in stability_summary.items():
         print(f"  {sc:<20}: Overlap {info['overlap']}/5 | Stability {info['stability_pct']:.0f}%")
+
+    mc_df, mc_summary = run_monte_carlo(df)
+    mc_df.to_csv('data/sensitivity_monte_carlo.csv', index=False)
+    print(f"\n=== MONTE-CARLO TOP-{MC_TOP_N} INCLUSION PROBABILITY "
+          f"({mc_summary['n_sim']} Dirichlet draws, seed={mc_summary['seed']}) ===")
+    print(mc_df.head(10)[['rank', 'vehicle', 'part_category',
+                           'priority_score', 'p_top5', 'stability']].to_string(index=False))
+    print(f"\n  Baseline Top-{MC_TOP_N} minimum inclusion probability: "
+          f"{mc_summary['baseline_top5_min_p']:.1%}")
+    print(f"  Combinations that ever entered the Top-{MC_TOP_N}: "
+          f"{mc_summary['n_combinations_ever_top5']}/30")
+
+    dropout_df, dropout_summary = run_factor_dropout(df)
+    dropout_df.to_csv('data/sensitivity_factor_dropout.csv')
+    print(f"\n=== ONE-WAY FACTOR DROPOUT ROBUSTNESS "
+          f"(Top-{dropout_summary['top_n']} survival, deterministic) ===")
+    print(dropout_df[['overlap', 'stability_pct']].to_string())
+    print(f"\n  Minimum Top-{dropout_summary['top_n']} overlap when any single "
+          f"factor is removed: {dropout_summary['min_overlap']}/{dropout_summary['top_n']}")
+    print(f"  Top-{dropout_summary['top_n']} overlap when the Scarcity (S) factor is "
+          f"removed entirely: {dropout_summary['scarcity_dropout_overlap']}/"
+          f"{dropout_summary['top_n']}")

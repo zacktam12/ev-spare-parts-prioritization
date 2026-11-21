@@ -1,0 +1,31 @@
+vehicle,part_category,rank,priority_score,p_top5,stability
+BYD Seagull,Shock absorber,3,4.45,0.991,robust
+BYD Seagull,Bumper,4,4.45,0.991,robust
+BYD Seagull,Brake pads,2,4.45,0.987,robust
+BYD Seagull,Side mirror,1,4.6,0.9535,robust
+BYD Seagull,Brake discs,6,4.15,0.482,sensitive
+BYD Seagull,Headlight assembly,5,4.300000000000001,0.4545,sensitive
+Toyota bZ4X,Cabin-air filter,14,3.55,0.0455,sensitive
+BYD Yuan Up,Side mirror,18,3.4,0.038,sensitive
+Toyota bZ4X,Headlight assembly,12,3.7,0.0295,sensitive
+BYD Yuan Up,Brake pads,20,3.1,0.009,sensitive
+BYD Yuan Up,Headlight assembly,21,3.1,0.009,sensitive
+BYD Yuan Up,Shock absorber,22,3.1,0.0075,sensitive
+Toyota bZ4X,Wiper blades,15,3.55,0.002,sensitive
+BYD Yuan Up,Cabin-air filter,24,2.9000000000000004,0.0005,sensitive
+BYD Seagull,Tail-light assembly,7,4.0,0.0,excluded
+Toyota bZ4X,Shock absorber,8,3.9000000000000004,0.0,excluded
+BYD Seagull,Fender / body panel,9,3.8499999999999996,0.0,excluded
+Toyota bZ4X,Side mirror,10,3.75,0.0,excluded
+Toyota bZ4X,Bumper,11,3.75,0.0,excluded
+Toyota bZ4X,Brake pads,13,3.6500000000000004,0.0,excluded
+Toyota bZ4X,Tail-light assembly,16,3.45,0.0,excluded
+Toyota bZ4X,Fender / body panel,17,3.45,0.0,excluded
+Toyota bZ4X,Brake discs,19,3.3500000000000005,0.0,excluded
+BYD Seagull,Cabin-air filter,23,2.9000000000000004,0.0,excluded
+BYD Yuan Up,Brake discs,25,2.6,0.0,excluded
+BYD Yuan Up,Wiper blades,26,2.6,0.0,excluded
+BYD Yuan Up,Bumper,27,2.6,0.0,excluded
+BYD Yuan Up,Tail-light assembly,28,2.6,0.0,excluded
+BYD Yuan Up,Fender / body panel,29,2.6,0.0,excluded
+BYD Seagull,Wiper blades,30,2.4,0.0,excluded

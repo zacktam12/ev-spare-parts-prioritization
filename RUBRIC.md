@@ -53,13 +53,27 @@ and are reproduced in [comprehensive_project_report.md §7](reports/comprehensiv
 All four scenarios retain **100.0% Top-5 set overlap** (verified by
 `tests/test_scoring_model.py::test_sensitivity_analysis_reports_full_top5_stability`).
 
+A stronger, scenario-independent check is provided by `run_monte_carlo()`: 2,000 weight
+vectors are drawn uniformly from the 5-factor simplex (`Dirichlet(1)`, `seed=42`) and each
+combination's Top-5 inclusion probability is recorded in
+`data/sensitivity_monte_carlo.csv`. The top four combinations are **robust** (≥95%
+inclusion); the 5th slot is genuinely contested (Headlight 45.5%, Brake discs 48.2%).
+
+A third check isolates the factor whose evidence is weakest. The 25%-weighted Scarcity
+factor (`S`) rests partly on the Gezat (`S002`) review, which was conducted at
+catalogue/model level only — no per-part search was recorded. `run_factor_dropout()` drops
+each factor to zero weight in turn, renormalises the rest, and re-ranks
+(`data/sensitivity_factor_dropout.csv`). **Removing `S` entirely leaves the Top-5 unchanged
+(5/5)**; dropping any other single factor keeps at least 4/5, and only Demand is
+load-bearing. The recommendation therefore does not hinge on the unverified `S` input.
+
 ---
 
 ## 3. Self-assessment against the rubric
 
 | # | Component | Evidence artifact(s) | Verify with | Status | Residual risk (honest) |
 |:-:|:----------|:---------------------|:------------|:------:|:-----------------------|
-| 1 | Scoring Method & Justification (25%) | `scraper/generate_scores_defensible.py` (weights, thresholds, per-row justifications); `data/scoring_results.csv` (4 scenario columns); report §7–§8 | `pytest tests/test_scoring_model.py` | **Strong** | Demand `D` remains an analyst-judged proxy; weights are judgement choices (mitigated, not eliminated, by the 4-scenario sensitivity test). |
+| 1 | Scoring Method & Justification (25%) | `scraper/generate_scores_defensible.py` (weights, thresholds, per-row justifications); `data/scoring_results.csv` (4 scenario columns); `data/sensitivity_monte_carlo.csv`; `data/sensitivity_factor_dropout.csv`; report §7–§8 | `pytest tests/test_scoring_model.py` | **Strong** | Demand `D` remains an analyst-judged proxy and `S` rests on a catalogue/model-level distributor review; weights are judgement choices. Mitigated by three robustness tests (4-scenario, 2,000-draw Monte-Carlo, one-way factor dropout), which show the Top-5 survives even removing `S`. |
 | 2 | Source Quality & Evidence (20%) | `data/source_log.csv` (8 sources, URLs, dates); `data/raw/raw_observations.csv` (`observation_type`); `REUSE.md` | `pytest tests/test_data_integrity.py -k source` | **Strong, bounded by public data** | Evidence is public-online only: no workshop survey, no physical stock check, no licensed-registration data. Third-party catalogue and unverified-quote rows are labelled, not upgraded. |
 | 3 | Dataset Design & Cleaning (20%) | `db/schema.sql` (tested schema); `data/cleaned/cleaned_observations.csv` (59×23); `docs/data_dictionary.md` | `pytest tests/test_schema.py` | **Strong** | `price_missing`/`is_cross_checked` flags are complete, but 22 unpriced rows mean `P` rests on listing presence rather than observed price for those entries. |
 | 4 | Business-Problem Understanding (15%) | `notebooks/01_vehicle_selection.ipynb`; README business context; report §1, §4; deck slides 2–3 | manual review | **Strong** | Policy/forex context is described qualitatively; no local market-sizing model is provided. |
@@ -71,7 +85,7 @@ All four scenarios retain **100.0% Top-5 set overlap** (verified by
 ## 4. Reproduce every claim
 
 ```powershell
-python run_pipeline.py --test   # rebuild data -> figures -> deck, then run 48 validation tests
+python run_pipeline.py --test   # rebuild data -> figures -> deck, then run 63 validation tests
 ```
 
 Individual checks:

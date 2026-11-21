@@ -85,7 +85,7 @@ for i, (name, weights) in enumerate(scenarios.items()):
 
 plt.xlabel('Top 5 Recommended Vehicle-Part Combinations', fontsize=12, labelpad=10)
 plt.ylabel('Scenario Score (Max 5.0)', fontsize=12, labelpad=10)
-plt.title('Stability Verification: Top 5 Scores Across 4 Weighting Scenarios (100% Set Overlap)', fontsize=14, weight='bold', pad=15)
+plt.title('Stability Across 4 Predefined Weighting Scenarios (100% Set Overlap)', fontsize=14, weight='bold', pad=15)
 plt.xticks(x + width*1.5, [lbl.replace(' — ', '\n') for lbl in top5_labels], fontsize=9)
 plt.ylim(3.5, 5.0)
 plt.legend(frameon=True, facecolor='white', loc='lower right')
@@ -121,3 +121,37 @@ plt.tight_layout()
 plt.savefig('reports/figures/top5_radar_profiles.png')
 plt.close()
 print("Saved top5_radar_profiles.png")
+
+# 5. MONTE-CARLO STABILITY (Top-5 inclusion probability over Dirichlet weight draws)
+# Produced by scraper/generate_scores_defensible.py -> data/sensitivity_monte_carlo.csv.
+# Unlike the 4-scenario chart, this draws 2,000 weight vectors uniformly from the
+# 5-factor simplex, so it measures robustness without depending on hand-picked weights.
+mc = pd.read_csv('data/sensitivity_monte_carlo.csv')
+ROBUST_THRESHOLD = 80.0  # %
+
+mc_top = mc[mc['p_top5'] > 0].head(12).copy()
+mc_top['label'] = mc_top['vehicle'] + ' — ' + mc_top['part_category']
+mc_top = mc_top.sort_values('p_top5', ascending=True)
+
+plt.figure(figsize=(11, 6.5), dpi=300)
+color_map = {'robust': '#2a9d8f', 'sensitive': '#e9c46a'}
+bar_colors = [color_map.get(s, '#adb5bd') for s in mc_top['stability']]
+bars = plt.barh(mc_top['label'], mc_top['p_top5'] * 100.0, color=bar_colors, height=0.68)
+
+plt.axvline(ROBUST_THRESHOLD, color='#c1121f', linestyle='--', linewidth=1.6)
+plt.text(ROBUST_THRESHOLD + 1.0, -0.9, f'{ROBUST_THRESHOLD:.0f}% robustness threshold',
+         color='#c1121f', fontsize=9, va='center', ha='left')
+
+for bar in bars:
+    w = bar.get_width()
+    plt.text(w + 1.2, bar.get_y() + bar.get_height() / 2, f'{w:.1f}%',
+             va='center', ha='left', fontsize=9, weight='bold')
+
+plt.xlim(0, 108)
+plt.xlabel('Top-5 inclusion probability across 2,000 Dirichlet weight draws (%)', fontsize=12, labelpad=10)
+plt.title('Monte-Carlo Robustness: How Often Each Combination Ranks Top-5',
+          fontsize=14, weight='bold', pad=15)
+plt.tight_layout()
+plt.savefig('reports/figures/monte_carlo_stability.png')
+plt.close()
+print("Saved monte_carlo_stability.png")

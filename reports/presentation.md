@@ -138,9 +138,10 @@ a procurement shortlist, not a purchase order."
 
 ---
 
-## Slide 9 — Sensitivity analysis: stability across 4 scenarios
+## Slide 9 — Robustness: 4 scenarios + Monte-Carlo + factor dropout
 
-**Show:** `reports/figures/sensitivity_comparison.png`.
+**Show:** `reports/figures/sensitivity_comparison.png` (4 scenarios) and, if time allows,
+`reports/figures/monte_carlo_stability.png` (robustness).
 
 **Say:** "We re-scored everything under four weighting perspectives — baseline, scarcity-first,
 equal-weights, and evidence-focused. The same five combinations stayed in the top five in every
@@ -153,8 +154,21 @@ scenario, a 100% set overlap."
 | Equal-weights | 20/20/20/20/20 | 100% |
 | Evidence-focused | 25/20/20/15/20 | 100% |
 
-**Say (defensible interpretation):** "This demonstrates stability under these selected
-scenarios — not universal robustness or proven market demand."
+**Say (the stronger test):** "Because those four scenarios are weight vectors we chose, we also
+ran a **2,000-draw Monte-Carlo** that samples weights uniformly from the five-factor simplex.
+The top **four** combinations are robust — each enters the top five in ≥95% of draws (shock
+absorber 99.1%, bumper 99.1%, brake pads 98.7%, side mirror 95.4%). The **fifth slot is
+genuinely contested** between headlight assembly (45.5%) and brake discs (48.2%)."
+
+**Say (the third test — the weak-input check):** "The Scarcity factor carries 25% but rests
+partly on the Gezat (`S002`) review, which was catalogue/model-level only. So we also ran a
+**one-way factor dropout**: remove each factor to zero weight, renormalise, re-rank. Dropping
+**`S` entirely leaves the Top-5 unchanged (5/5)** — the ranking does not hinge on that weak
+input. Dropping any single factor keeps at least 4 of 5; only Demand is load-bearing."
+
+**Say (defensible interpretation):** "So the ranking is stable under all three tests, and we
+present the fifth pick as an interchangeable, evidence-tied pair — not as a claim of universal
+robustness or proven market demand."
 
 ---
 
@@ -196,8 +210,18 @@ A: `toyota-spare-parts.com` is a third-party aggregator, not the official Toyota
 it honestly lowered C to 4 and E to 3, yielding an honest 3.90.
 
 **Q: How sensitive is the ranking to the weights?**
-A: The same five combinations stayed in the top five across the four tested scenarios — stability
-under these scenarios, not universal robustness.
+A: Three tests. (1) Under four hand-picked scenarios the same five combinations stay in the top
+five (100% set overlap). (2) Under a stronger 2,000-draw Monte-Carlo over the weight simplex, the
+top **four** are robust (≥95% inclusion) and only the **5th slot** is contested (headlight 45.5%
+vs brake discs 48.2%). (3) A one-way factor dropout removes any single factor and keeps at least
+4/5. So stability holds, but the 5th pick is an evidence-tied pair, not a fixed choice.
+
+**Q: Your Scarcity (S) factor has the second-highest weight but rests on an unverified Gezat review — isn't that a weak point?**
+A: It is the acknowledged weak input, and we tested exactly that. The Gezat `S002` review was
+catalogue/model-level only with no per-part search, so local per-part availability is unverified.
+The factor-dropout test removes `S` entirely: the Top-5 is unchanged (5/5), so the prioritisation
+does not hinge on it. Removing any other single factor also keeps at least 4/5 — only Demand is
+load-bearing.
 
 **Q: Does a high score mean fast sales?**
 A: No. It means the combination scored highly on the selected evidence dimensions; sales velocity

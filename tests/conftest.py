@@ -51,3 +51,8 @@ def source_log() -> pd.DataFrame:
 @pytest.fixture(scope="session")
 def scoring_df() -> pd.DataFrame:
     return pd.read_csv(DATA / "scoring_results.csv")
+
+
+@pytest.fixture(scope="session")
+def factor_dropout_csv() -> pd.DataFrame:
+    return pd.read_csv(DATA / "sensitivity_factor_dropout.csv", index_col="dropped_factor")

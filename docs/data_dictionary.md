@@ -8,8 +8,10 @@ UTF-8 CSV with a single header row and are validated by
 | :--- | :--- | :---: | :--- |
 | Raw observations | [`data/raw/raw_observations.csv`](../data/raw/raw_observations.csv) | 59 rows × 19 cols | Source-of-truth evidence as collected (one row = one source-backed fact) |
 | Cleaned observations | [`data/cleaned/cleaned_observations.csv`](../data/cleaned/cleaned_observations.csv) | 59 rows × 23 cols | Raw + 4 derived columns (USD price, missing flag, cross-check flag, compatibility class) |
-| Source registry | [`data/source_log.csv`](../data/source_log.csv) | 8 rows × 7 cols | Master list of the 8 sources (`S001`–`S008`) |
+| Source registry | [`data/source_log.csv`](../data/source_log.csv) | 8 rows × 9 cols | Master list of the 8 sources (`S001`–`S008`) with reliability tiers |
 | Scoring results | [`data/scoring_results.csv`](../data/scoring_results.csv) | 30 rows × 14 cols | One row per vehicle × part-category combination; the model output |
+| Monte-Carlo robustness | [`data/sensitivity_monte_carlo.csv`](../data/sensitivity_monte_carlo.csv) | 30 rows × 6 cols | Top-5 inclusion probability per combination over 2,000 Dirichlet weight draws |
+| Factor-dropout robustness | [`data/sensitivity_factor_dropout.csv`](../data/sensitivity_factor_dropout.csv) | 5 rows × 3 cols | Top-5 survival when each single factor is dropped to zero weight |
 
 > **Unit-of-analysis warning.** These files have different row meanings and must not be
 > compared by row count. 59 observations support 30 scored combinations because several
@@ -27,7 +29,7 @@ trade quotation, or a safety-context record.
 | 1 | `observation_id` | string | Primary key, stable row identifier | `OBS001`–`OBS059`, unique |
 | 2 | `vehicle` | string | Vehicle model | `BYD Seagull`, `BYD Yuan Up`, `Toyota bZ4X` |
 | 3 | `model_year` | string | Model-year range claimed by the source | e.g. `2023-2024`, `2020-` |
-| 4 | `part_category` | string | Harmonised part category (one of the 10) | see §5 |
+| 4 | `part_category` | string | Harmonised part category (one of the 10) | see §7 |
 | 5 | `part_description` | string | Human-readable part name | free text |
 | 6 | `oem_part_number` | string | Part reference **as printed by the source** | empty when the source listed no number; NOT independently EPC-verified |
 | 7 | `supplier` | string | Supplier / catalogue name | e.g. `Landin BYD Parts` |
@@ -84,7 +86,7 @@ never fabricates values.
 
 ---
 
-## 3. `data/source_log.csv` (8 × 7)
+## 3. `data/source_log.csv` (8 × 9)
 
 | Column | Description |
 | :--- | :--- |
@@ -95,9 +97,25 @@ never fabricates values.
 | `collection_date` | ISO date (`2026-11-18`) |
 | `what_it_provides` | What the source contributes to the project |
 | `reliability_note` | Honest reliability caveat for that source |
+| `reliability_tier` | Credibility grade (`A`, `B`, `C`) — see legend below |
+| `url_verified` | `True` when a working URL was captured at collection; `False` when no URL was recorded |
+
+### `reliability_tier` legend (enforced by `db/schema.sql` and `tests/`)
+
+| Tier | Meaning | Sources |
+| :---: | :--- | :--- |
+| `A` | Authoritative — regulator dataset, a named supplier catalogue carrying OEM part numbers with an explicit fitment statement, or an established parts-reference benchmark | `S003` Landin, `S004` CQSW, `S006` NHTSA |
+| `B` | Commercial third-party — marketplace, aggregator, or distributor catalogue without OEM-confirmed fitment | `S001` Adey, `S002` Gezat, `S005` toyota-spare-parts.com, `S007` AutoZone |
+| `C` | Unverified — unnamed trade directory; must be scored conservatively (`E`=1, `P`=1) | `S008` |
+
+**Invariant (tested):** every `A`/`B` source must carry a verified `http(s)` URL; tier `C`
+sources are the only ones permitted to have `url_verified = False`. The tier is the
+evidence basis for the `E` (Evidence Confidence) factor: `A`-backed rows score `E`=4–5,
+`B`-backed rows `E`=3–4, and `C`-backed rows `E`=1.
 
 > Note: `source_type` here uses human-readable labels. `db/schema.sql` stores a
-> normalised lowercase enum for the same concept.
+> normalised lowercase enum for the same concept, together with the same
+> `reliability_tier` / `url_verified` columns.
 
 ---
 
@@ -127,7 +145,52 @@ Scenario columns use lowercase snake_case names so they are valid SQL/Python ide
 
 ---
 
-## 5. Shared controlled vocabularies
+## 5. `data/sensitivity_monte_carlo.csv` (30 × 6)
+
+One row = one vehicle × part-category combination. Produced by
+`run_monte_carlo()` in
+[`scraper/generate_scores_defensible.py`](../scraper/generate_scores_defensible.py).
+It draws 2,000 weight vectors uniformly from the 5-factor simplex
+(`Dirichlet(alpha=1.0)`, `seed=42`) and records how often each combination lands in
+the Top 5. Deterministic for a fixed `(seed, n_sim, alpha)`.
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `vehicle` | string | Vehicle model |
+| `part_category` | string | Part category |
+| `rank` | int 1–30 | Baseline rank (matches `scoring_results.csv`) |
+| `priority_score` | float | Baseline priority score |
+| `p_top5` | float 0–1 | Share of the 2,000 draws in which the combination ranked Top-5 |
+| `stability` | string | `robust` (`p_top5 ≥ 0.80`) · `sensitive` (`0 < p_top5 < 0.80`) · `excluded` (`p_top5 = 0`) |
+
+Rows are sorted by `p_top5` descending. Because each draw elects exactly 5 winners,
+`p_top5` sums to 5.0 across the 30 rows. The baseline Top-5 is *not* uniformly robust:
+the top four combinations score ≥0.95, while the 5th slot is contested.
+
+---
+
+## 6. `data/sensitivity_factor_dropout.csv` (5 × 3)
+
+One row = one factor. Produced by `run_factor_dropout()` in
+[`scraper/generate_scores_defensible.py`](../scraper/generate_scores_defensible.py).
+It drops each factor to zero weight in turn, renormalises the remaining weights, re-ranks
+all 30 combinations, and records the overlap with the baseline Top-5. Deterministic (no
+random draws). This is the evidence-strength stress test for the Scarcity (`S`) factor,
+which rests on a catalogue/model-level distributor review (`S002`).
+
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `dropped_factor` | string (index) | The factor set to zero weight (`demand_evidence`, …) |
+| `top5` | string | The Top-5 combination labels (pipe-separated) under the reduced weighting |
+| `overlap` | int 0–5 | Number of baseline Top-5 members that survive |
+| `stability_pct` | float | `overlap / 5 × 100` |
+
+Removing `S` leaves the Top-5 unchanged (`overlap = 5`); only Demand is load-bearing
+(`overlap = 4`).
+
+---
+
+## 7. Shared controlled vocabularies
 
 **10 part categories**: Brake pads · Brake discs · Cabin-air filter · Wiper blades ·
 Headlight assembly · Tail-light assembly · Side mirror · Bumper · Fender / body panel ·
@@ -140,7 +203,7 @@ Equal-weights (20 × 5) · Evidence-focused (25/20/20/15/20). All sum to 1.00.
 
 ---
 
-## 6. Non-negotiable data-integrity rules
+## 8. Non-negotiable data-integrity rules
 
 These are enforced by [`tests/`](../tests/) and restated in
 [`CONTRIBUTING.md`](../CONTRIBUTING.md):

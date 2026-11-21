@@ -72,6 +72,11 @@ def test_observations_has_expected_column_count(conn):
     assert len(columns) == 23
 
 
+def test_sources_has_expected_column_count(conn):
+    columns = conn.execute("PRAGMA table_info(sources)").fetchall()
+    assert len(columns) == 9
+
+
 def test_scoring_results_has_expected_column_count(conn):
     columns = conn.execute("PRAGMA table_info(scoring_results)").fetchall()
     assert len(columns) == 14
@@ -105,6 +110,23 @@ def test_invalid_source_type_is_rejected(conn):
     with pytest.raises(sqlite3.IntegrityError):
         conn.execute(
             "INSERT INTO sources (source_id, source_name, source_url, source_type, "
-            "market_scope, collection_date) "
-            "VALUES ('S999','n','u','not_a_type','Global','2026-11-18')"
+            "market_scope, collection_date, reliability_tier, url_verified) "
+            "VALUES ('S999','n','https://x','not_a_type','Global','2026-11-18','A',1)"
         )
+
+
+def test_invalid_reliability_tier_is_rejected(conn):
+    with pytest.raises(sqlite3.IntegrityError):
+        conn.execute(
+            "INSERT INTO sources (source_id, source_name, source_url, source_type, "
+            "market_scope, collection_date, reliability_tier, url_verified) "
+            "VALUES ('S998','n','https://x','marketplace','Global','2026-11-18','D',1)"
+        )
+
+
+def test_tiered_source_with_verified_url_is_accepted(conn):
+    conn.execute(
+        "INSERT INTO sources (source_id, source_name, source_url, source_type, "
+        "market_scope, collection_date, reliability_tier, url_verified) "
+        "VALUES ('S997','n','https://x','marketplace','Global','2026-11-18','A',1)"
+    )

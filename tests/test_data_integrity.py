@@ -47,6 +47,34 @@ def test_every_source_has_url_and_date(source_log):
 
 
 # ---------------------------------------------------------------------------
+# Source reliability tiering (A/B/C) and URL verification
+# ---------------------------------------------------------------------------
+def _as_bool(series):
+    return series.astype(str).str.strip().str.lower().isin({"true", "1"})
+
+
+def test_every_source_has_a_reliability_tier(source_log):
+    assert "reliability_tier" in source_log.columns
+    assert source_log["reliability_tier"].notna().all()
+    assert set(source_log["reliability_tier"]).issubset({"A", "B", "C"})
+
+
+def test_high_tier_sources_carry_a_verified_http_url(source_log):
+    """Every tier A/B source must have a recorded and verified http(s) URL."""
+    high = source_log[source_log["reliability_tier"].isin(["A", "B"])]
+    assert len(high) == 7
+    assert _as_bool(high["url_verified"]).all()
+    assert high["url"].str.strip().str.startswith(("http://", "https://")).all()
+
+
+def test_only_tier_c_sources_may_be_unverified(source_log):
+    """S008 is the only unverified source, and it must be the only tier C row."""
+    unverified = source_log[~_as_bool(source_log["url_verified"])]
+    assert set(unverified["source_id"]) == {"S008"}
+    assert set(unverified["reliability_tier"]) == {"C"}
+
+
+# ---------------------------------------------------------------------------
 # Raw observations
 # ---------------------------------------------------------------------------
 def test_raw_has_59_rows_and_19_columns(raw_df):

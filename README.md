@@ -9,10 +9,10 @@ Following Ethiopia's 2024 ban on internal combustion engine (ICE) passenger car 
 This project delivers an end-to-end, reproducible decision framework by:
 1. Selecting three representative EV models from live Ethiopian marketplace evidence
 2. Investigating 10 spare-part categories across those vehicles (a complete $3 \times 10 = 30$ combination matrix)
-3. Compiling an auditable evidence dataset of 59 empirical observations classified across 8 sources
+3. Compiling an auditable evidence dataset of 59 empirical observations classified across 8 reliability-tiered sources (tiers `A`/`B`/`C`, each with a recorded URL)
 4. Cleaning and standardizing the dataset, preserving missing values and normalizing currencies to USD
 5. Evaluating all 30 combinations with an explainable, 5-factor weighted priority scoring model
-6. Verifying mathematical robustness across 4 contrasting weighting scenarios (**100.0% Top-5 Ranking Stability**)
+6. Verifying robustness three ways — 4 contrasting weighting scenarios (**100.0% Top-5 set overlap**), a **2,000-draw Monte-Carlo** over the weight simplex (top-4 combinations robust at ≥95% inclusion), and a **one-way factor dropout** (Top-5 survives intact when the unverified Scarcity factor is removed entirely)
 7. Recommending the top 5 prioritized part categories accompanied by concrete supplier-listed OE applications
 
 ---
@@ -67,8 +67,10 @@ ev-spare-parts-prioritization/
 │   │   └── raw_observations.csv        ← 59 rows: unedited scraped & logged observations
 │   ├── cleaned/
 │   │   └── cleaned_observations.csv    ← 59 rows, 23 columns: normalized currencies, clean taxonomy
-│   ├── source_log.csv                  ← Master registry of all 8 sources with URLs and dates
-│   └── scoring_results.csv             ← 30 rows: calculated factor scores, weights, sensitivity ranks
+│   ├── source_log.csv                  ← Master registry of all 8 sources with URLs, dates & A/B/C reliability tiers
+│   ├── scoring_results.csv             ← 30 rows: calculated factor scores, weights, sensitivity ranks
+│   ├── sensitivity_monte_carlo.csv     ← 30 rows: Top-5 inclusion probability over 2,000 weight draws
+│   └── sensitivity_factor_dropout.csv  ← 5 rows: Top-5 survival when each single factor is dropped
 │
 ├── notebooks/                          ← 4 sequential, fully executed Jupyter Notebooks
 │   ├── 01_vehicle_selection.ipynb      ← Vehicle market analysis (5 candidates -> 3 selected)
@@ -85,7 +87,8 @@ ev-spare-parts-prioritization/
 │   └── figures/                        ← 300 DPI publication charts
 │       ├── scoring_matrix_heatmap.png  ← 30-combination prioritization heatmap
 │       ├── top10_priority_rankings.png ← Horizontal bar chart of Top 10 recommendations
-│       ├── sensitivity_comparison.png  ← Verification chart of 100% stability across 4 scenarios
+│       ├── sensitivity_comparison.png  ← Stability across 4 predefined weighting scenarios
+│       ├── monte_carlo_stability.png   ← Top-5 inclusion probability over 2,000 Dirichlet draws
 │       └── top5_radar_profiles.png     ← 5-axis factor radar charts for Top 5 recommendations
 │
 ├── scraper/                           ← Pipeline automation & export scripts
@@ -94,10 +97,11 @@ ev-spare-parts-prioritization/
     ├── generate_scores_defensible.py   ← Authoritative scoring and sensitivity analysis module
     ├── export_figures.py               ← Visualizations exporter producing reports/figures/
     ├── generate_presentation.py        ← Presentation generator producing reports/*.pptx
-    └── ...                             ← scraper app (main.py, scrapers/), helper & legacy scripts
+    ├── main.py / scrapers/             ← Multi-source scraper CLI (13 registered sources)
+    └── ...                             ← compile/repair helpers & legacy scripts
 
 ├── db/
-│   ├── schema.sql                     ← SQLite DDL reference model (6 tables, 4 indexes)
+│   ├── schema.sql                     ← SQLite DDL reference model (5 tables, 4 indexes)
 │   └── ev_parts.db                    ← Materialised SQLite build of the datasets (59/30/8 rows)
 
 ├── docs/
@@ -108,6 +112,7 @@ ev-spare-parts-prioritization/
     ├── conftest.py                    ← Loads standalone pipeline scripts as modules
     ├── test_data_integrity.py         ← Row counts, provenance, enums, no-fabrication rules
     ├── test_scoring_model.py          ← Recomputes the model, diffs vs committed CSV
+    ├── test_scrapers.py               ← Source registry wiring + payload-parsing helpers
     └── test_schema.py                 ← Loads db/schema.sql into SQLite; checks CHECKs
 ```
 
@@ -163,7 +168,7 @@ The scoring model evaluates 30 vehicle-model + part-category combinations. The t
 | **#4** | **BYD Seagull** | **Bumper**<br>*(Front bumper cover upper fascia)* | **4.45** | 198 RMB ($27.72 USD) | `EQEA-2083111`<br>*(OE flagged for supplier confirmation — see limitations)* | Landin Parts (`S003`) body catalogue |
 | **#5** | **BYD Seagull** | **Headlight assembly**<br>*(LH headlight; companion RH)* | **4.30** | 418 RMB ($58.52 USD)<br>*(RH: 418 RMB / $58.52)* | `EQEA-4121010B` (LH)<br>`EQEA-4121020B` (RH) | Landin Parts (`S003`) lighting catalogue |
 
-*Sensitivity Analysis Finding: The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios. The result demonstrates stability under these selected scenarios, not universal robustness or proven market demand.*
+*Robustness Finding: The same five vehicle-category combinations remained in the top five across the four tested weighting scenarios (100% set overlap). Under a stronger **Monte-Carlo** test — 2,000 weight vectors drawn uniformly from the 5-factor simplex (`data/sensitivity_monte_carlo.csv`) — the top **four** combinations are robust (≥95% Top-5 inclusion: Shock absorber 99.1%, Bumper 99.1%, Brake pads 98.7%, Side mirror 95.4%), while the 5th slot is genuinely contested (Headlight assembly 45.5%, Brake discs 48.2%). A **one-way factor dropout** (`data/sensitivity_factor_dropout.csv`) then removes each factor in turn: dropping the **Scarcity (`S`) factor entirely leaves the Top-5 unchanged (5/5)**, so the recommendation does not hinge on the catalogue/model-level distributor review (`S002`) that underpins `S`. Dropping any other single factor keeps at least 4/5 — only Demand is load-bearing. The result demonstrates stability under the tested scenarios, not universal robustness or proven market demand.*
 
 ---
 
@@ -205,16 +210,45 @@ python scraper/export_figures.py
 python scraper/generate_presentation.py
 ```
 
-### 3. Verification
+### 3. Scraper registry
+
+The multi-source collector app lives in [`scraper/`](scraper/) (`main.py` + `scrapers/`).
+Each source is a `BaseScraper` subclass registered in a central registry:
 
 ```powershell
-python -m pytest -ra              # the executable contract (48 tests)
+python scraper/main.py --list            # list the 13 registered sources
+python scraper/main.py --scraper gezat   # scrape one source (→ outputs/gezat.json)
+python scraper/main.py --all --pages 2   # run every source, two pages each
+```
+
+| Source | Site / endpoint | What it collects |
+| :--- | :--- | :--- |
+| `adey` | adey-market.com | BYD/Toyota/VW EV listings (`S001`) |
+| `landin` | landinparts.com | BYD Seagull parts catalogue (`S003`) |
+| `gezat` | gezat.et | Electric-vehicle listing cards (`S002`) |
+| `jiji` | jiji.com.et (JSON) | Vehicle listings **and** `scrape_parts()` car-parts searches |
+| `mekina` | mekina.net (JSON) | Electric-vehicle listings |
+| `afromekina` | api.afromekina.com (JSON) | Electric-vehicle listings |
+| `asiautos` | asiautos.net (Shopify feed) | BYD parts / part numbers |
+| `evprotec` | evprotec.com (WooCommerce API) | VW ID.4 / ID.6 parts |
+| `nbe` | api.nbe.gov.et | Official ETB exchange rates |
+| `nhtsa` | api.nhtsa.gov | Owner complaints & recall campaigns (platform context only) |
+| `quotes`, `books`, `dynamic_sample` | teaching fixtures | dummy targets for the scraping harness |
+
+The ported sources honour the main app's `BaseScraper` contract and consult `robots.txt`
+before fetching. Every fetch redacts phone numbers and e-mail addresses before persisting.
+
+### 4. Verification
+
+```powershell
+python -m pytest -ra              # the executable contract (77 tests)
 python -m pytest --cov=scraper    # with coverage
 ```
 
 The suite recomputes the scoring model and diffs it against the committed
-`data/scoring_results.csv`, validates dataset schemas/provenance, and loads
-`db/schema.sql` into SQLite to exercise its CHECK constraints.
+`data/scoring_results.csv`, validates dataset schemas/provenance, loads
+`db/schema.sql` into SQLite to exercise its CHECK constraints, and checks the
+scraper registry wiring plus each source's payload-parsing helpers (offline).
 
 ---
 
