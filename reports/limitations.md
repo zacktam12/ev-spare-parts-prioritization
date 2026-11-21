@@ -38,7 +38,7 @@ Landin Parts (`landinparts.com/byd/`) confirmed zero Yuan Up listings as of 2026
 
 ## 2. Analyst Assumptions — Not Observed Data
 
-The following scoring inputs are analyst judgements. No local measurement, survey, or statistical dataset was collected to quantify them. They are explicitly labelled here and in `scrapper/generate_scores_defensible.py`.
+The following scoring inputs are analyst judgements. No local measurement, survey, or statistical dataset was collected to quantify them. They are explicitly labelled here and in `scraper/generate_scores_defensible.py`.
 
 | Assumption Used in Scoring | Actual Measurement Available | Consequence If Wrong |
 | :--- | :--- | :--- |
@@ -68,7 +68,7 @@ Adey Market listing counts (used for Demand scores) represent **active advertise
 - Sales volume data from any authorised distributor
 - Confirmed fleet sizes
 
-The listing counts quoted in this project (Seagull 37, Yuan Up 36, bZ4X 28) come from the collected Adey dataset (`scrapper/outputs/adey_cleaned.csv`, 208 rows) and are treated as a **sample**, not a verified marketplace total. A vehicle model with a large number of Adey listings reflects strong secondary-market trading activity but does not directly measure how many vehicles of that model are currently on Ethiopian roads.
+The listing counts quoted in this project (Seagull 37, Yuan Up 36, bZ4X 28) come from the collected Adey dataset (`scraper/outputs/adey_cleaned.csv`, 208 rows) and are treated as a **sample**, not a verified marketplace total. A vehicle model with a large number of Adey listings reflects strong secondary-market trading activity but does not directly measure how many vehicles of that model are currently on Ethiopian roads.
 
 ---
 
@@ -113,7 +113,7 @@ NHTSA records are classified as `safety_context` in `data/raw/raw_observations.c
 
 ## 8. Scoring Is Analyst Judgement, Not Algorithmic Derivation
 
-Factor scores are manually assigned analyst judgements. They are NOT algorithmically calculated from observation row counts or statistical regression. The scoring rubric defining 1–5 thresholds for every factor is documented in `scrapper/generate_scores_defensible.py` with per-row evidence citations. Any competent analyst reading those citations should be able to replicate or challenge each score independently.
+Factor scores are manually assigned analyst judgements. They are NOT algorithmically calculated from observation row counts or statistical regression. The scoring rubric defining 1–5 thresholds for every factor is documented in `scraper/generate_scores_defensible.py` with per-row evidence citations. Any competent analyst reading those citations should be able to replicate or challenge each score independently.
 
 ---
 
