@@ -64,7 +64,7 @@ All four scenarios retain **100.0% Top-5 set overlap** (verified by
 | 3 | Dataset Design & Cleaning (20%) | `db/schema.sql` (tested schema); `data/cleaned/cleaned_observations.csv` (59×23); `docs/data_dictionary.md` | `pytest tests/test_schema.py` | **Strong** | `price_missing`/`is_cross_checked` flags are complete, but 22 unpriced rows mean `P` rests on listing presence rather than observed price for those entries. |
 | 4 | Business-Problem Understanding (15%) | `notebooks/01_vehicle_selection.ipynb`; README business context; report §1, §4; deck slides 2–3 | manual review | **Strong** | Policy/forex context is described qualitatively; no local market-sizing model is provided. |
 | 5 | Recommendations & Limitations (10%) | `reports/findings.md` (5 single-application recommendations); `reports/limitations.md` (9 boundaries) | manual review | **Strong** | All five recommendations are BYD Seagull because it is the only vehicle with a verified supplier catalogue — a correct but narrow evidence base. |
-| 6 | Presentation & Code Organization (10%) | `README.md`; `REUSE.md`; `AGENT_HANDOFF.md`; `run_pipeline.py`; `Makefile`; `tests/`; CI workflow; executed notebooks | `python run_pipeline.py --test` | **Strong** | Attribution is documented in `REUSE.md`; no third-party code was copied, so there is no code-level licence entanglement. |
+| 6 | Presentation & Code Organization (10%) | `README.md`; `REUSE.md`; `run_pipeline.py`; `Makefile`; `tests/`; CI workflow; executed notebooks | `python run_pipeline.py --test` | **Strong** | Attribution is documented in `REUSE.md`; no third-party code was copied, so there is no code-level licence entanglement. |
 
 ---
 

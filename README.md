@@ -50,7 +50,6 @@ This project delivers an end-to-end, reproducible decision framework by:
 ev-spare-parts-prioritization/
 │
 ├── README.md                           ← [You Are Here] Project overview & quickstart
-├── AGENT_HANDOFF.md                    ← Technical architecture & constraints for AI code agents
 ├── RUBRIC.md                           ← Rubric weights + self-assessment mapped to evidence
 ├── CONTRIBUTING.md                     ← Contributing guide + the 7 data-integrity rules
 ├── CHANGELOG.md                        ← Keep-a-Changelog release history
@@ -228,7 +227,6 @@ The suite recomputes the scoring model and diffs it against the committed
 - **Data Dictionary**: [`docs/data_dictionary.md`](docs/data_dictionary.md)
 - **7-Minute Presentation Script & Defense Q&A**: [`reports/presentation.md`](reports/presentation.md)
 - **PowerPoint Presentation Deck**: [`reports/EV_Spare_Parts_Prioritization_Presentation.pptx`](reports/EV_Spare_Parts_Prioritization_Presentation.pptx)
-- **AI Agent Technical Handoff**: [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md)
 - **SQLite Schema Reference**: [`db/schema.sql`](db/schema.sql)
 
 ---

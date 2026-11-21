@@ -97,7 +97,7 @@ never fabricates values.
 | `reliability_note` | Honest reliability caveat for that source |
 
 > Note: `source_type` here uses human-readable labels. `db/schema.sql` stores a
-> normalised lowercase enum for the same concept; see §4 of [AGENT_HANDOFF.md](../AGENT_HANDOFF.md).
+> normalised lowercase enum for the same concept.
 
 ---
 
