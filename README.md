@@ -89,7 +89,7 @@ ev-spare-parts-prioritization/
 │       ├── sensitivity_comparison.png  ← Verification chart of 100% stability across 4 scenarios
 │       └── top5_radar_profiles.png     ← 5-axis factor radar charts for Top 5 recommendations
 │
-└── scraper/                           ← Pipeline automation & export scripts
+├── scraper/                           ← Pipeline automation & export scripts
     ├── compile_raw_observations_defensible.py ← Rebuilds data/raw/raw_observations.csv
     ├── repair_raw_observations.py      ← Applies provenance corrections to raw observations
     ├── generate_scores_defensible.py   ← Authoritative scoring and sensitivity analysis module
@@ -98,23 +98,22 @@ ev-spare-parts-prioritization/
     └── ...                             ← scraper app (main.py, scrapers/), helper & legacy scripts
 
 ├── db/
-│   └── schema.sql                     ← SQLite DDL reference model (6 tables, 4 indexes)
+│   ├── schema.sql                     ← SQLite DDL reference model (6 tables, 4 indexes)
+│   └── ev_parts.db                    ← Materialised SQLite build of the datasets (59/30/8 rows)
 
 ├── docs/
 │   ├── data_dictionary.md             ← Column-level reference for every dataset
 │   └── rubric_compliance.csv          ← Machine-readable rubric self-assessment
 
-├── tests/                             ← pytest suite (the executable contract)
-│   ├── conftest.py                    ← Loads standalone pipeline scripts as modules
-│   ├── test_data_integrity.py         ← Row counts, provenance, enums, no-fabrication rules
-│   ├── test_scoring_model.py          ← Recomputes the model, diffs vs committed CSV
-│   └── test_schema.py                 ← Loads db/schema.sql into SQLite; checks CHECKs
-
-└── refer/legacy/                      ← Archived earlier attempts (reference only)
-    ├── ev-spare-parts2/
-    ├── ev-spare-parts-import3/
-    └── db_reference/ev_parts.db
+└── tests/                             ← pytest suite (the executable contract)
+    ├── conftest.py                    ← Loads standalone pipeline scripts as modules
+    ├── test_data_integrity.py         ← Row counts, provenance, enums, no-fabrication rules
+    ├── test_scoring_model.py          ← Recomputes the model, diffs vs committed CSV
+    └── test_schema.py                 ← Loads db/schema.sql into SQLite; checks CHECKs
 ```
+
+> `refer/` is **not part of this project** — it holds third-party reference repositories.
+> It is git-ignored and excluded from the submission archive.
 
 ---
 

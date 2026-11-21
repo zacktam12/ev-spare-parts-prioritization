@@ -81,7 +81,6 @@ CREATE TABLE IF NOT EXISTS scoring_results (
     score_Equal_weights     REAL NOT NULL,
     score_Evidence_focused  REAL NOT NULL,
     rank                    INTEGER NOT NULL,
-    p_top5_monte_carlo      REAL,
     PRIMARY KEY (vehicle, part_category)
 );
 
