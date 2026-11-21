@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ev-spare-parts-prioritization"
+version = "1.0.0"
+description = "Data-driven prioritization of EV spare-parts imports for the Ethiopian market under foreign-exchange rationing."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "EV Spare-Parts Prioritization Project" }]
+keywords = [
+    "electric-vehicles",
+    "spare-parts",
+    "ethiopia",
+    "multi-criteria-decision-analysis",
+    "sensitivity-analysis",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+dev = ["pytest==9.2.0", "pytest-cov==7.1.0"]
+
+[tool.setuptools]
+# This repository is a script-driven analysis pipeline rather than an importable
+# library, so it intentionally ships no installable packages. Entry point is
+# `run_pipeline.py` at the repository root.
+packages = []
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["scraper"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]

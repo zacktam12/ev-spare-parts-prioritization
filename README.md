@@ -51,8 +51,17 @@ ev-spare-parts-prioritization/
 │
 ├── README.md                           ← [You Are Here] Project overview & quickstart
 ├── AGENT_HANDOFF.md                    ← Technical architecture & constraints for AI code agents
-├── requirements.txt                    ← Python virtual environment dependencies
+├── RUBRIC.md                           ← Rubric weights + self-assessment mapped to evidence
+├── CONTRIBUTING.md                     ← Contributing guide + the 7 data-integrity rules
+├── CHANGELOG.md                        ← Keep-a-Changelog release history
 ├── REUSE.md                            ← Reference repository attribution & audit
+├── LICENSE                             ← MIT license
+├── requirements.txt                    ← Python virtual environment dependencies
+├── pyproject.toml                      ← Build metadata & tool config (pytest / ruff / black)
+├── .editorconfig                       ← Cross-editor whitespace & encoding rules
+├── Makefile                            ← Convenience targets (setup / pipeline / test / lint)
+├── run_pipeline.py                     ← Offline pipeline orchestrator (raw → … → deck)
+├── .github/workflows/ci.yml            ← CI: run pipeline + pytest on windows-latest
 │
 ├── data/
 │   ├── raw/
@@ -80,10 +89,31 @@ ev-spare-parts-prioritization/
 │       ├── sensitivity_comparison.png  ← Verification chart of 100% stability across 4 scenarios
 │       └── top5_radar_profiles.png     ← 5-axis factor radar charts for Top 5 recommendations
 │
-└── scrapper/                           ← Pipeline automation & export scripts
+└── scraper/                           ← Pipeline automation & export scripts
+    ├── compile_raw_observations_defensible.py ← Rebuilds data/raw/raw_observations.csv
+    ├── repair_raw_observations.py      ← Applies provenance corrections to raw observations
     ├── generate_scores_defensible.py   ← Authoritative scoring and sensitivity analysis module
     ├── export_figures.py               ← Visualizations exporter producing reports/figures/
-    └── generate_presentation.py        ← Presentation generator producing reports/*.pptx
+    ├── generate_presentation.py        ← Presentation generator producing reports/*.pptx
+    └── ...                             ← scraper app (main.py, scrapers/), helper & legacy scripts
+
+├── db/
+│   └── schema.sql                     ← SQLite DDL reference model (6 tables, 4 indexes)
+
+├── docs/
+│   ├── data_dictionary.md             ← Column-level reference for every dataset
+│   └── rubric_compliance.csv          ← Machine-readable rubric self-assessment
+
+├── tests/                             ← pytest suite (the executable contract)
+│   ├── conftest.py                    ← Loads standalone pipeline scripts as modules
+│   ├── test_data_integrity.py         ← Row counts, provenance, enums, no-fabrication rules
+│   ├── test_scoring_model.py          ← Recomputes the model, diffs vs committed CSV
+│   └── test_schema.py                 ← Loads db/schema.sql into SQLite; checks CHECKs
+
+└── refer/legacy/                      ← Archived earlier attempts (reference only)
+    ├── ev-spare-parts2/
+    ├── ev-spare-parts-import3/
+    └── db_reference/ev_parts.db
 ```
 
 ---
@@ -152,33 +182,55 @@ pip install -r requirements.txt
 ```
 
 ### 2. End-to-End Pipeline Execution
+
+The supported way to rebuild every derived artefact is the orchestrator:
+
 ```powershell
-# 1. Execute scoring engine and output data/scoring_results.csv
-python scrapper/generate_scores_defensible.py
-
-# 2. Export high-resolution publication charts to reports/figures/
-python scrapper/export_figures.py
-
-# 3. Generate editable 12-slide PowerPoint presentation with speaker notes
-python scrapper/generate_presentation.py
-
-# 4. Execute all Jupyter Notebooks end-to-end
-python -m jupyter nbconvert --to notebook --execute --inplace notebooks/01_vehicle_selection.ipynb
-python -m jupyter nbconvert --to notebook --execute --inplace notebooks/02_data_collection.ipynb
-python -m jupyter nbconvert --to notebook --execute --inplace notebooks/03_data_cleaning.ipynb
-python -m jupyter nbconvert --to notebook --execute --inplace notebooks/04_analysis_and_scoring.ipynb
+python run_pipeline.py             # raw → repair → scores → figures → deck
+python run_pipeline.py --list      # list stages
+python run_pipeline.py --only scores
+python run_pipeline.py --notebooks # also re-execute notebooks 01–04
 ```
+
+The equivalent manual steps (run from the repo root):
+
+```powershell
+# 1. Rebuild the raw observation table (only if inputs changed)
+python scraper/compile_raw_observations_defensible.py
+# 2. Apply provenance corrections to the raw observations
+python scraper/repair_raw_observations.py
+# 3. Execute scoring engine → data/scoring_results.csv
+python scraper/generate_scores_defensible.py
+# 4. Export publication charts → reports/figures/
+python scraper/export_figures.py
+# 5. Generate the 12-slide PowerPoint deck with speaker notes
+python scraper/generate_presentation.py
+```
+
+### 3. Verification
+
+```powershell
+python -m pytest -ra              # the executable contract (48 tests)
+python -m pytest --cov=scraper    # with coverage
+```
+
+The suite recomputes the scoring model and diffs it against the committed
+`data/scoring_results.csv`, validates dataset schemas/provenance, and loads
+`db/schema.sql` into SQLite to exercise its CHECK constraints.
 
 ---
 
 ## Deliverables Summary
 
+- **Rubric Compliance & Self-Assessment**: [`RUBRIC.md`](RUBRIC.md)
 - **Master Technical Report**: [`reports/comprehensive_project_report.md`](reports/comprehensive_project_report.md)
 - **Detailed Findings & Procurement Roadmap**: [`reports/findings.md`](reports/findings.md)
 - **Documented Limitations & Assumptions**: [`reports/limitations.md`](reports/limitations.md)
+- **Data Dictionary**: [`docs/data_dictionary.md`](docs/data_dictionary.md)
 - **7-Minute Presentation Script & Defense Q&A**: [`reports/presentation.md`](reports/presentation.md)
 - **PowerPoint Presentation Deck**: [`reports/EV_Spare_Parts_Prioritization_Presentation.pptx`](reports/EV_Spare_Parts_Prioritization_Presentation.pptx)
 - **AI Agent Technical Handoff**: [`AGENT_HANDOFF.md`](AGENT_HANDOFF.md)
+- **SQLite Schema Reference**: [`db/schema.sql`](db/schema.sql)
 
 ---
 
